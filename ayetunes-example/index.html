@@ -1,0 +1,57 @@
+<html>
+<head>
+<title>
+  Aye Tunesification
+</title>
+<link rel="stylesheet" href="css/styles.css" media="screen">
+<style>
+ </style>
+</head>
+<body>
+
+
+<div id="wrapper">
+
+</div>
+<div>
+<span id="msg">The first item highlighted is </span> <span id="selid"></span>
+</div>
+<div>
+<script src="js/ayetunes.js"></script>
+<script>
+  (function(){
+    var el0 = document.getElementById('selid')
+    , el1 =  document.getElementById('msg')
+    , testfunction = function(id){
+        el1.innerHTML = 'The current highlighted object row has an id of ';
+        el0.innerHTML = id;
+        document.body.style.backgroundColor = '#'+id+'fff'
+    }
+    , setUp = {
+      auto: 3000,
+      wrapper:'wrapper',
+      randomise:true,
+      mouseoverpause:true,
+      pausebutton:true,
+      carousel:'left',
+      callbackfunc:testfunction,
+      sections:[
+        {id:'ccc', sm:'img/PNG_S_0.png',lg:'img/PNG0.png',link:'https://github.com/daithiw44'},
+        {id:'eee', sm:'img/PNG_S_1.png',lg:'img/PNG1.png',link:'https://github.com/daithiw44'},
+        {id:'999', sm:'img/PNG_S_2.png',lg:'img/PNG2.png',link:'https://github.com/daithiw44'},
+        {id:'ff0', sm:'img/PNG_S_3.png',lg:'img/PNG3.png',link:'https://github.com/daithiw44'},
+        {id:'ff9', sm:'img/PNG_S_4.png',lg:'img/PNG4.png',link:'https://github.com/daithiw44'},
+        {id:'ee5', sm:'img/PNG_S_5.png',lg:'img/PNG5.png',link:'https://github.com/daithiw44'}
+      ]
+    },
+    movies = new AyeTunes ();
+    movies.init(setUp);
+    el0.innerHTML = movies.register.first;
+    }());
+    
+</script>
+
+</body>
+</html>
+
+
