@@ -6,7 +6,7 @@ Library free javascript module for creating a scrolling image column and a easeo
 See ayetunes-example for a quick example of how to create a new ayetunes class
 
 Create a setup object.
-
+```
 	setUp = {
       auto: 3000,
       wrapper:'wrapper',
@@ -26,7 +26,7 @@ Create a setup object.
     },
     ayetunes = new AyeTunes ();
     ayetunes.init(setUp);
-
+```
 Properties of the AyeTunes setup object.
 
 1.	auto: This is the time between tansitions. (milliseconds)
