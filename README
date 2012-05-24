@@ -1,6 +1,6 @@
 AyeTunes-Carousel.
 
-<div style="font-size:12px">
+
 Library free javascript module for creating a scrolling image column and a easeout ease in large image something like iTunes.
 
 See ayetunes-example for a quick example of how to create a new ayetunes class
@@ -51,4 +51,3 @@ Properties of the AyeTunes setup object.
 		sm: the small image for the scrolling carousel.
 		lg: the large image that fades in and out as the section becomes highlighted etc.
 		link: the url that wraps the sm and lg images which redirect the user when they are clicked.
-</div>
