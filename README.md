@@ -1,6 +1,6 @@
 AyeTunes-Carousel.
 
-Library free javascript module for creating a scrolling image column and a easeout ease in large image something like iTunes.
+Library free javascript module for creating a scrolling image column with an easeout/easein large image alng the lines iTunes.
 
 See ayetunes-example for a quick example of how to create a new ayetunes class
 
