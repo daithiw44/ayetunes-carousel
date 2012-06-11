@@ -12,8 +12,8 @@ var AyeTunes = (function() {
     this.options = {};
     this.timer = null;
     this.register = {
-      active: 1
     };
+    this.active = 1;
   }
 
   AyeTunes.prototype = {
@@ -28,13 +28,15 @@ var AyeTunes = (function() {
       if (typeof initObj.callbackfunc === 'function') {
         this.callbackfunc = initObj.callbackfunc;
       }
+      this.active = initObj.activecell;
+      this.smallloadlarge = false;
       /**
        * Requires DOM elements so is called after setUp.
        * @method afterSetUp
        * @param object initObj.
        */
       afterSetUp = function(initObj) {
-        this.register.first = initObj.sections[1].id;
+        this.register.first = initObj.sections[0].id;
         this.ulHolder = this.ulHolder();
         this.nextBtn = this.getBtn('at_nextbtn');
         if (initObj.pausebutton === true || initObj.mouseoverpause === true) {
@@ -68,8 +70,35 @@ var AyeTunes = (function() {
             }
           }, that);
         }
+        if (initObj.smallloadlarge === true) {
+          this.addEvent(this.ulHolder, 'click', function(e) {
+            var i, li, inter, stFunc,
+                sectionObj, target;
+            if (!e) { e = window.event;}
+	            if (e.target) {target = e.target;}
+	            else if (e.srcElement) {target = e.srcElement;}
+            if (e.preventDefault) { e.preventDefault(); } else { e.returnValue = false; }
+            sectionObj = that.options.sections;
+            li = that.ulHolder.getElementsByTagName('li');
+            stFunc = function() {
+              that.fullOpacity(li, li[0]);
+              that.nextDeux(li[1].getAttribute('type'));
+            };
+            for (i = 0; i < sectionObj.length; i++) {
+              if (sectionObj[i].id === target.getAttribute('type')) {
+                if (target.parentNode.parentNode === li[2] && that.active === 0) {
+                  that.fullOpacity(li, li[0], stFunc);
+                } else {
+                  that.next();
+                }
+                break;
+              }
+            }
+          }, that);
+        }
         if (initObj.pausebutton === true || initObj.mouseoverpause === true) {
           this.addEvent(this.pauseBtn, 'click', function(e) {
+            if (e.preventDefault) { e.preventDefault(); } else { e.returnValue = false; }
             if (initObj.pausebutton === true) {
               var target = that.pauseBtn;
               if (that.hasClass(target, 'at_pause')) {
@@ -86,12 +115,10 @@ var AyeTunes = (function() {
                 }
               }
             }
-            e.preventDefault();
           }, that);
         }
         this.addEvent(this.nextBtn, 'click', function(e) {
-          var target = e ? e.target : window.event.srcElement;
-          e.preventDefault();
+          if (e.preventDefault) { e.preventDefault(); } else { e.returnValue = false; }
           that.stop();
           that.next();
           if (typeof that.pauseBtn === 'undefined' || that.hasClass(that.pauseBtn, 'at_play')) {
@@ -104,7 +131,9 @@ var AyeTunes = (function() {
          */
         if (window.addEventListener) {
           window.addEventListener('focus', function() {
-            that.ticker();
+            if (that.hasClass(that.pauseBtn, 'at_play')) {
+              that.ticker();
+            }
           },false);
 
           window.addEventListener('blur', function() {
@@ -152,7 +181,7 @@ var AyeTunes = (function() {
       feature = document.createElement('div');
       feature.setAttribute('class', 'at_feature');
       nextLnk = document.createElement('a');
-      nextLnk.setAttribute('href', initObj.sections[that.register.active].link);
+      nextLnk.setAttribute('href', initObj.sections[0].link);
       nextLnk.style.height = '420px';
       nextLnk.style.width = '699px';
       feature.appendChild(nextLnk);
@@ -193,17 +222,82 @@ var AyeTunes = (function() {
      * @method next
      */
     next: function() {
-      var bImg = this.wrapper.children[0].children[1].children[0].children[0],
-          closure;
-      if (this.register.active < this.options.sections.length - 1) {
-        this.register.active++;
-      } else {
-        this.register.active = 0;
+      var li = this.ulHolder.getElementsByTagName('li'), that = this;
+      that.moveUp(li[0]);
+    },
+
+    /**
+     * Sets the active Li and calls the animScroll method
+     * @method moveUp
+     */
+    moveUp: function(el) {
+      var sel, li = this.ulHolder.getElementsByTagName('li');
+      sel = li[this.active + 1].getAttribute('type');//here+1
+      this.nextDeux(sel);
+      this.fullOpacity(li, el);
+    },
+
+    /*
+     *
+     */
+    fullOpacity: function(lis, el, callback) {
+      var i = 0;
+      // if((navigator.userAgent.match(/iPhone/i)) || (navigator.userAgent.match(/iPod/i))) {
+      while (i < lis.length && i < 4) {
+        if (!this.hasClass(lis[i].firstChild, 'bloomActive')) {
+          this.addClass(lis[i].firstChild, 'bloomActive');
+        }
+        i++;
       }
-      this.moveUp();
+      /*  } else {
+        this.addClass(lis[1].firstChild, 'bloomActive');
+      }*/
+      this.animScroll(el, callback);
+    },
+
+    /**
+     * closure to scroll the ils elements and keep things in balance.
+     * @method animScroll
+     * @param DOM Element el.
+     */
+    animScroll: function(el, callback) {
+      var that = this,
+          ulHolderEl = that.ulHolder;
+
+      function scroll() {
+        var h = parseInt(ulHolderEl.style.top, 10);
+        h -= 5;
+        if (h > -140) {
+          h -= 5;
+          ulHolderEl.style.top = h + 'px';
+          setTimeout(scroll, 20);
+        } else {
+          ulHolderEl.removeChild(el);
+          ulHolderEl.style.top = '0px';
+          //   if((navigator.userAgent.match(/iPhone/i)) || (navigator.userAgent.match(/iPod/i))) {
+          that.removeClass(ulHolderEl.children[0].firstChild, 'bloomActive');
+          that.removeClass(ulHolderEl.children[1].firstChild, 'bloomActive');
+          that.removeClass(ulHolderEl.children[2].firstChild, 'bloomActive');
+          that.removeClass(ulHolderEl.children[3].firstChild, 'bloomActive');
+          that.addClass(ulHolderEl.children[that.active].firstChild, 'bloomActive');
+
+          /* } else {
+            that.removeClass(el.firstChild, 'bloomActive');
+          }*/
+          ulHolderEl.appendChild(el);
+          if (typeof callback === 'function') {
+            callback();
+          }
+        }
+      }
+      setTimeout(scroll, 20);
+    },
+
+    nextDeux: function(sel) {
+      var closure, bImg = this.wrapper.children[0].children[1].children[0].children[0];
       bImg.style.opacity = 0.4;
-      bImg.parentNode.parentNode.style.backgroundImage = "url('" + this.options.sections[this.register.active].lg + "')";
-      closure = this.makeBind(this, this.imgSwapAnim);
+      bImg.parentNode.parentNode.style.backgroundImage = "url('" + this.options.sections[sel].lg + "')";
+      closure = this.makeBind(this, function() {this.imgSwapAnim(sel);});
       setTimeout(closure, 130);
     },
 
@@ -211,19 +305,35 @@ var AyeTunes = (function() {
      * Fade out the big image.
      * @method imgSwapAnim
      */
-    imgSwapAnim: function() {
+    imgSwapAnim: function(sel) {
+
       var that = this, hh = this.wrapper.children[0].children[1].children[0].children[0];
       function fade() {
         var h = hh;
-        h.style.opacity -= 0.05;
+        h.style.opacity -= 0.08;
         if (h.style.opacity > 0.15) {
           h.style.opacity -= 0.05;
           setTimeout(fade, 100);
         } else {
-          that.changeBigImage();
+
+          that.changeBigImage(sel);
         }
       }
-      setTimeout(fade, 20);
+      setTimeout(fade, 15);
+    },
+
+    /**
+     * Change the big Image.
+     * @method changeBigImage
+     */
+    changeBigImage: function(sel) {
+      var elImg = this.wrapper.children[0].children[1].children[0].children[0];
+      elImg.src = this.options.sections[sel].lg;
+      elImg.parentNode.setAttribute('href', this.options.sections[sel].link);
+      // this.order.splice(0,1);
+      if (typeof this.callbackfunc !== 'undefined') {
+        this.callbackfunc(this.options.sections[sel].id);
+      }
     },
 
     /**
@@ -259,13 +369,13 @@ var AyeTunes = (function() {
       var opac = false,
           i, elImg;
       for (i = 0; i < sections.length; i++) {
-        if (i === 1) {
+        if (i === this.active) {
           opac = true;
           elImg = document.createElement('img');
           elImg.src = sections[i].lg;
           this.wrapper.children[0].children[1].children[0].appendChild(elImg);
         }
-        this.makeIl(sections[i], opac);
+        this.makeIl(sections[i], opac, i);
         opac = false;
       }
     },
@@ -276,14 +386,18 @@ var AyeTunes = (function() {
      * @param section
      * @param opac
      */
-    makeIl: function(section, opac) {
+    makeIl: function(section, opac,pos) {
       var docFrag = document.createDocumentFragment(),
           elIl = document.createElement('li'),
-          elImg, elHf;
+          elImg, elHf, preloadImg;
       elIl.setAttribute('class', 'at_case');
+      elIl.setAttribute('type', pos);
       elHf = document.createElement('a');
       elHf.setAttribute('href', section.link);
+      preloadImg = new Image();
+      preloadImg.src = section.lg;
       elImg = document.createElement('img');
+      elImg.setAttribute('type', section.id);
       if (opac === true && this.hasClass(elHf, 'bloomActive') === false) {
         this.addClass(elHf, 'bloomActive');
       }
@@ -298,55 +412,17 @@ var AyeTunes = (function() {
     },
 
     /**
-     * Sets the active Li and calls the animScroll method
-     * @method moveUp
+     * Onclick event if href for small image isn't wanted lad the lgImg.
+     *
      */
-    moveUp: function() {
-      var li = this.ulHolder.getElementsByTagName('li'),
-          el = li[0];
-      this.removeClass(li[1].firstChild, 'bloomActive');
-      if (this.hasClass(li[2].firstChild, 'bloomActive') === false) {
-        this.addClass(li[2].firstChild, 'bloomActive');
-      }
-      this.animScroll(el);
-    },
-
-    /**
-     * closure to scroll the ils elements and keep things in balance.
-     * @method animScroll
-     * @param DOM Element el.
-     */
-    animScroll: function(el) {
-      var that = this,
-          ulHolderEl = that.ulHolder;
-
-      function scroll() {
-        var h = parseInt(that.ulHolder.style.top, 10);
-        h -= 5;
-        if (h > -140) {
-          h -= 5;
-          ulHolderEl.style.top = h + 'px';
-          setTimeout(scroll, 20);
-        } else {
-          ulHolderEl.removeChild(el);
-          ulHolderEl.style.top = '0px';
-          that.removeClass(el, 'bloomActive');
-          ulHolderEl.appendChild(el);
+    loadLgImg: function(id) {
+      var i, present = this.options.sections,
+          elImg = this.wrapper.children[0].children[1].children[0].children[0];
+      for (i = 0; i < present.length; i++) {
+        if (present[i].id === id) {
+          elImg.parentNode.parentNode.style.backgroundImage = "url('" + this.options.sections[i].lg + "')";
+          elImg.src = this.options.sections[i].lg;
         }
-      }
-      setTimeout(scroll, 20);
-    },
-
-    /**
-     * Change the big Image.
-     * @method changeBigImage
-     */
-    changeBigImage: function() {
-      var elImg = this.wrapper.children[0].children[1].children[0].children[0];
-      elImg.src = this.options.sections[this.register.active].lg;
-      elImg.parentNode.setAttribute('href', this.options.sections[this.register.active].link);
-      if (typeof this.callbackfunc !== 'undefined') {
-        this.callbackfunc(this.options.sections[this.register.active].id);
       }
     },
 
@@ -463,7 +539,5 @@ var AyeTunes = (function() {
       }
     }
   };
-
   return AyeTunes;
-
 }());
