@@ -1,5 +1,5 @@
 /**
- * AyeTunes (itunes like carousel)
+ * AyeTunes (iTunes like carousel)
  * author: @Daith44
  *
  */
@@ -472,7 +472,6 @@ var AyeTunes = (function() {
    * Utilities
    * @methods bindings, makeBind, addEvent, nodeHandler, hasClass, removeClass, addCLass
    */
-
     bindings: function() {
       this.makeBind(this, this.imgSwapAnim);
     },

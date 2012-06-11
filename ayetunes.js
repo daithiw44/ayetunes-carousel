@@ -1,5 +1,5 @@
 /**
- * AyeTunes (itunes like carousel)
+ * AyeTunes (iTunes like carousel)
  * author: @Daith44
  *
  */

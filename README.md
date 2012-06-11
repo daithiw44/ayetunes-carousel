@@ -1,4 +1,4 @@
-AyeTunes-Carousel.
+AyeTunes-Carousel. (iTunes like Carousel)
 
 Library free javascript module for creating a scrolling image column with an easeout/easein large image along the lines iTunes.
 
