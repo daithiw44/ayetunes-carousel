@@ -1,5 +1,7 @@
 AyeTunes-Carousel. (iTunes like Carousel)
 
+Video here. https://vimeo.com/125250627
+
 Library free javascript module for creating a scrolling image column with an easeout/easein large image along the lines iTunes.
 
 See ayetunes-example for a quick example of how to create a new ayetunes class
